@@ -1,4 +1,6 @@
 use core::fmt;
+use std::fs::File;
+use std::io::prelude::Write;
 
 use serde_json::json;
 
@@ -123,20 +125,26 @@ impl Generator {
             target_rectangles,
         }
     }
+
+    pub fn write_file(&self, path: &str) -> std::io::Result<()> {
+        let mut file = File::create(path)?;
+        file.write_all(self.generate_json().as_bytes())?;
+        Ok(())
+    }
+
+    fn generate_json(&self) -> String {
+        serde_json::to_string_pretty(&json!({
+            "numRects": self.number_of_rectangles,
+            "sourceRectangles": self.source_rectangles,
+            "targetRectangles": self.target_rectangles
+        }))
+        .unwrap()
+    }
 }
 
 impl fmt::Display for Generator {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(&json!({
-                "numRects": self.number_of_rectangles,
-                "sourceRectangles": self.source_rectangles,
-                "targetRectangles": self.target_rectangles
-            }))
-            .unwrap()
-        )
+        write!(f, "{}", self.generate_json())
     }
 }
 

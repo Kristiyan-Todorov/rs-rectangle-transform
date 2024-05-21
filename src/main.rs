@@ -1,5 +1,4 @@
 use generator::Generator;
-use serde_json::json;
 use std::io::stdin;
 
 pub mod generator;
@@ -7,7 +6,7 @@ pub mod rectangle;
 
 fn main() {
     let mut s = String::new();
-    let mut number_of_rectangles: usize = 0;
+    let number_of_rectangles: usize;
 
     loop {
         s.clear();
@@ -34,8 +33,8 @@ fn main() {
     let generator = Generator::new(number_of_rectangles);
 
     println!("{}", generator);
-}
 
-// let source_rectangles: Vec<Rectangle> = serde_json::from_str(
-//     r#"[{ "x": 0, "y": 150, "width" : 50, "height": 100}, { "x": 50, "y": 150, "width" : 40, "height": 87}, { "x": 90, "y": 150, "width" : 70, "height": 66}, { "x": 160, "y": 150, "width" : 45, "height": 146},{ "x": 205, "y": 150, "width" : 30, "height": 54}]"#,
-// ).unwrap();
+    generator
+        .write_file("rectangle_transform.json")
+        .expect("Unable to write to file");
+}
