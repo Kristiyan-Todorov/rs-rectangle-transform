@@ -89,7 +89,7 @@ fn transform_rectangles(source_rectangles: &Vec<Rectangle>) -> Vec<Rectangle> {
                     // get all rectangles below current
                     let bottom: Vec<&Rectangle> = prev
                         .iter()
-                        .filter(|p| p.x < cur.x && p.x + p.width > cur.x)
+                        .filter(|p| p.x <= cur.x && p.x + p.width >= cur.x)
                         .collect();
 
                     // get last rectangle below current
