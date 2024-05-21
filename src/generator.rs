@@ -1,8 +1,7 @@
 use core::fmt;
+use serde_json::json;
 use std::fs::File;
 use std::io::prelude::Write;
-
-use serde_json::json;
 
 use crate::rectangle::{create_ajacent_rectangle, create_base_rectangle, Rectangle};
 
@@ -65,14 +64,26 @@ fn transform_rectangles(source_rectangles: &Vec<Rectangle>) -> Vec<Rectangle> {
                 let higher_ajacent = [left, vec![cur], right].concat();
 
                 if higher_ajacent.len() > 1 {
-                    let first = higher_ajacent.first().unwrap();
-                    let last = higher_ajacent.last().unwrap();
-                    let y = prev.iter().map(|r| r.height).sum();
+                    // left most vertical ajacent to get x coordinates
+                    let left_most = higher_ajacent.first().unwrap();
+
+                    // get all rectangles below current
+                    let bottom: Vec<&Rectangle> = prev
+                        .iter()
+                        .filter(|p| p.x < cur.x && p.x + p.width > cur.x)
+                        .collect();
+
+                    // get last rectangle below current
+                    let bottom_rectangle = bottom.last().unwrap();
+                    // y coordinates based on bottom rectangle
+                    let y: u32 = bottom_rectangle.y - bottom_rectangle.height;
+                    let height_to_bottom: u32 = bottom.iter().map(|x| x.height).sum();
+                    let width: u32 = higher_ajacent.iter().map(|x| x.width).sum();
                     prev.push(Rectangle::new(
-                        first.x,
+                        left_most.x,
                         y,
-                        last.x + last.width,
-                        cur.height - y,
+                        width,
+                        cur.height - height_to_bottom,
                     ));
                 } else {
                     // no higher ajacent elements
@@ -81,9 +92,9 @@ fn transform_rectangles(source_rectangles: &Vec<Rectangle>) -> Vec<Rectangle> {
                     let ajacent = if original_index == 0 {
                         // original index is 0, pick right rectangle
                         &source_rectangles[1]
-                    } else if original_index == len {
+                    } else if original_index == len - 1 {
                         // original index is last, pick left rectangle
-                        &source_rectangles[len - 1]
+                        &source_rectangles[len - 2]
                     } else {
                         // pick higher ajacent rectangle
                         let mut ajacent = [
@@ -97,7 +108,7 @@ fn transform_rectangles(source_rectangles: &Vec<Rectangle>) -> Vec<Rectangle> {
 
                     prev.push(Rectangle::new(
                         cur.x,
-                        ajacent.height,
+                        ajacent.y - ajacent.height,
                         cur.width,
                         cur.height - ajacent.height,
                     ));
@@ -157,16 +168,47 @@ mod tests {
     #[test]
     fn test_rectangle_transform() -> Result<(), ()> {
         let source_rectangles: Vec<Rectangle> = serde_json::from_str(
-            r#"[{ "x": 0, "y": 150, "width" : 50, "height": 100}, { "x": 50, "y": 150, "width" : 40, "height": 87}, { "x": 90, "y": 150, "width" : 70, "height": 66}, { "x": 160, "y": 150, "width" : 45, "height": 146},{ "x": 205, "y": 150, "width" : 30, "height": 54}]"#,
-        ).unwrap();
+            r#"[
+                { "x": 0, "y": 150, "width" : 50, "height": 100},
+                { "x": 50, "y": 150, "width" : 40, "height": 87},
+                { "x": 90, "y": 150, "width" : 70, "height": 66},
+                { "x": 160, "y": 150, "width" : 45, "height": 146},
+                { "x": 205, "y": 150, "width" : 30, "height": 54}
+            ]"#,
+        )
+        .unwrap();
 
         let target_rectangles = transform_rectangles(&source_rectangles);
 
         assert_eq!(target_rectangles[0], Rectangle::new(0, 150, 235, 54));
-        assert_eq!(target_rectangles[1], Rectangle::new(0, 54, 205, 12));
-        assert_eq!(target_rectangles[2], Rectangle::new(0, 66, 90, 21));
-        assert_eq!(target_rectangles[3], Rectangle::new(0, 87, 50, 13));
-        assert_eq!(target_rectangles[4], Rectangle::new(160, 66, 45, 80));
+        assert_eq!(target_rectangles[1], Rectangle::new(0, 96, 205, 12));
+        assert_eq!(target_rectangles[2], Rectangle::new(0, 84, 90, 21));
+        assert_eq!(target_rectangles[3], Rectangle::new(0, 63, 50, 13));
+        assert_eq!(target_rectangles[4], Rectangle::new(160, 84, 45, 80));
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_rectangle_transform_2() -> Result<(), ()> {
+        let source_rectangles: Vec<Rectangle> = serde_json::from_str(
+            r#"[
+                {"x": 0, "y": 66, "width": 56, "height": 61 },
+                {"x": 56, "y": 66, "width": 18, "height": 41 },
+                {"x": 74, "y": 66, "width": 72, "height": 96 },
+                {"x": 146, "y": 66, "width": 14, "height": 63 },
+                {"x": 160, "y": 66, "width": 82, "height": 92 }
+            ]"#,
+        )
+        .unwrap();
+
+        let target_rectangles = transform_rectangles(&source_rectangles);
+
+        assert_eq!(target_rectangles[0], Rectangle::new(0, 66, 242, 41));
+        assert_eq!(target_rectangles[1], Rectangle::new(0, 25, 56, 20));
+        assert_eq!(target_rectangles[2], Rectangle::new(74, 25, 168, 22));
+        assert_eq!(target_rectangles[3], Rectangle::new(160, 3, 82, 29));
+        assert_eq!(target_rectangles[4], Rectangle::new(74, 3, 72, 33));
 
         Ok(())
     }
