@@ -14,12 +14,12 @@ fn random_dim() -> (u32, u32) {
     (w, h)
 }
 
-pub fn create_base_rectangle() -> Rectangle {
+fn create_base_rectangle() -> Rectangle {
     let (width, height) = random_dim();
 
     Rectangle::new(0, rand::thread_rng().gen_range(50..100), width, height)
 }
-pub fn create_ajacent_rectangle(r: &Rectangle) -> Rectangle {
+fn create_ajacent_rectangle(r: &Rectangle) -> Rectangle {
     let (width, height) = random_dim();
     Rectangle::new(r.x + r.width, r.y, width, height)
 }
@@ -57,7 +57,7 @@ fn transform_rectangles(source_rectangles: &Vec<Rectangle>) -> Vec<Rectangle> {
                 ));
             } else {
                 let original_index = source_rectangles.iter().position(|r| r == cur).unwrap();
-                // look left for higher ajacent rectangles
+                // look left for ajacent rectangles with bigger height
                 let mut left: Vec<Rectangle> = Vec::new();
                 for i in (0..original_index).rev() {
                     if source_rectangles[i].height < cur.height {
@@ -66,9 +66,10 @@ fn transform_rectangles(source_rectangles: &Vec<Rectangle>) -> Vec<Rectangle> {
                     left.push(source_rectangles[i].clone())
                 }
 
+                // persist original ordering
                 let left: Vec<&Rectangle> = left.iter().rev().collect();
 
-                // look right for higher ajacent rectangles
+                // look right for ajacent rectangles with bigger height
                 let mut right: Vec<&Rectangle> = Vec::new();
                 for i in original_index..source_rectangles.len() {
                     if i == original_index {
@@ -92,7 +93,7 @@ fn transform_rectangles(source_rectangles: &Vec<Rectangle>) -> Vec<Rectangle> {
                         .filter(|p| p.x <= cur.x && p.x + p.width >= cur.x)
                         .collect();
 
-                    // get last rectangle below current
+                    // get closest rectangle below current
                     let bottom_rectangle = bottom.last().unwrap();
                     // y coordinates based on bottom rectangle
                     let y: u32 = bottom_rectangle.y - bottom_rectangle.height;
