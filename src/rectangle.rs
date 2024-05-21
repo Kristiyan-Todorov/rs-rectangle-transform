@@ -17,7 +17,18 @@ fn random_vertical_dim() -> (u32, u32) {
 
     (w, h)
 }
-#[derive(Clone, Serialize, Deserialize, PartialEq)]
+
+pub fn create_base_rectangle() -> Rectangle {
+    let (width, height) = random_vertical_dim();
+
+    Rectangle::new(0, random(), width, height)
+}
+pub fn create_ajacent_rectangle(r: &Rectangle) -> Rectangle {
+    let (width, height) = random_vertical_dim();
+    Rectangle::new(r.x + r.width, r.y, width, height)
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Rectangle {
     pub x: u32,
     pub y: u32,
@@ -30,25 +41,6 @@ impl Rectangle {
         Rectangle {
             x: x,
             y: y,
-            width,
-            height,
-        }
-    }
-    pub fn base_vertical() -> Rectangle {
-        let (width, height) = random_vertical_dim();
-
-        Rectangle {
-            x: 0,
-            y: random(),
-            width,
-            height,
-        }
-    }
-    pub fn ajacent_vertical(r: &Rectangle) -> Rectangle {
-        let (width, height) = random_vertical_dim();
-        Rectangle {
-            x: r.x + r.width,
-            y: r.y,
             width,
             height,
         }
@@ -69,12 +61,12 @@ impl fmt::Display for Rectangle {
 mod tests {
     use more_asserts::assert_gt;
 
-    use super::Rectangle;
+    use crate::rectangle::{create_ajacent_rectangle, create_base_rectangle};
 
     #[test]
     fn test_rectangle_random_ajacent() -> Result<(), ()> {
-        let rectangle = Rectangle::base_vertical();
-        let ajacent = Rectangle::ajacent_vertical(&rectangle);
+        let rectangle = create_base_rectangle();
+        let ajacent = create_ajacent_rectangle(&rectangle);
 
         assert_gt!(rectangle.height, rectangle.width);
         assert_gt!(ajacent.height, ajacent.width);
