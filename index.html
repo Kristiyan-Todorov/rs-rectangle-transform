@@ -1,0 +1,237 @@
+<canvas width="800" height="600" style="background: #f4f4f4"></canvas>
+<script>
+	let canvas = document.querySelector('canvas');
+	let ctx = canvas.getContext('2d');
+
+	// let data = {
+	//     "numRects": 5,
+	//     "sourceRectangles": [
+	//         { "x": 0, "y": 150, "width" : 50, "height": 100},
+	//         { "x": 50, "y": 150, "width" : 40, "height": 87},
+	//         { "x": 90, "y": 150, "width" : 70, "height": 66},
+	//         { "x": 160, "y": 150, "width" : 45, "height": 146},
+	//         { "x": 205, "y": 150, "width" : 30, "height": 54}
+	//         ],
+	//     "targetRectangles": [
+	//         {"x": 0, "y": 150, "width": 235, "height": 54},
+	//         {"x": 0, "y": 96, "width": 205, "height": 12},
+	//         {"x": 0, "y": 84, "width": 90, "height": 21},
+	//         {"x": 0, "y": 63, "width": 50, "height": 13},
+	//         {"x": 160, "y": 84, "width": 45, "height": 80},
+	//     ]
+	// }
+
+	let data = {
+		numRects: 15,
+		sourceRectangles: [
+			{
+				height: 20,
+				width: 11,
+				x: 0,
+				y: 57
+			},
+			{
+				height: 34,
+				width: 19,
+				x: 11,
+				y: 57
+			},
+			{
+				height: 49,
+				width: 14,
+				x: 30,
+				y: 57
+			},
+			{
+				height: 26,
+				width: 14,
+				x: 44,
+				y: 57
+			},
+			{
+				height: 30,
+				width: 11,
+				x: 58,
+				y: 57
+			},
+			{
+				height: 20,
+				width: 11,
+				x: 69,
+				y: 57
+			},
+			{
+				height: 23,
+				width: 15,
+				x: 80,
+				y: 57
+			},
+			{
+				height: 15,
+				width: 12,
+				x: 95,
+				y: 57
+			},
+			{
+				height: 35,
+				width: 14,
+				x: 107,
+				y: 57
+			},
+			{
+				height: 20,
+				width: 18,
+				x: 121,
+				y: 57
+			},
+			{
+				height: 45,
+				width: 11,
+				x: 139,
+				y: 57
+			},
+			{
+				height: 35,
+				width: 11,
+				x: 150,
+				y: 57
+			},
+			{
+				height: 31,
+				width: 11,
+				x: 161,
+				y: 57
+			},
+			{
+				height: 49,
+				width: 18,
+				x: 172,
+				y: 57
+			},
+			{
+				height: 15,
+				width: 13,
+				x: 190,
+				y: 57
+			}
+		],
+		targetRectangles: [
+			{
+				height: 15,
+				width: 203,
+				x: 0,
+				y: 57
+			},
+			{
+				height: 0,
+				width: 203,
+				x: 0,
+				y: 42
+			},
+			{
+				height: 5,
+				width: 95,
+				x: 0,
+				y: 42
+			},
+			{
+				height: 0,
+				width: 95,
+				x: 0,
+				y: 37
+			},
+			{
+				height: 5,
+				width: 83,
+				x: 107,
+				y: 42
+			},
+			{
+				height: 3,
+				width: 15,
+				x: 80,
+				y: 37
+			},
+			{
+				height: 6,
+				width: 58,
+				x: 11,
+				y: 37
+			},
+			{
+				height: 4,
+				width: 11,
+				x: 58,
+				y: 31
+			},
+			{
+				height: 11,
+				width: 51,
+				x: 139,
+				y: 37
+			},
+			{
+				height: 8,
+				width: 33,
+				x: 11,
+				y: 31
+			},
+			{
+				height: 15,
+				width: 14,
+				x: 107,
+				y: 37
+			},
+			{
+				height: 4,
+				width: 22,
+				x: 139,
+				y: 26
+			},
+			{
+				height: 10,
+				width: 11,
+				x: 139,
+				y: 22
+			},
+			{
+				height: 15,
+				width: 14,
+				x: 30,
+				y: 23
+			},
+			{
+				height: 18,
+				width: 18,
+				x: 172,
+				y: 26
+			}
+		]
+	};
+
+	data.sourceRectangles.map(({ x, y, width, height }) => {
+		ctx.rect(x, y + 250, width, -height);
+		ctx.stroke();
+	});
+
+	data.targetRectangles.map(({ x, y, width, height }) => {
+		ctx.rect(x + 450, y + 250, width, -height);
+		ctx.stroke();
+	});
+	// [{ "x": 160, "y": 150, "width" : 45, "height": 146},{ "x": 205, "y": 150, "width" : 30, "height": 54}]
+	// r#"[
+	//     { "x": 0, "y": 150, "width" : 50, "height": 100},
+	//     { "x": 50, "y": 150, "width" : 40, "height": 87},
+	//     { "x": 90, "y": 150, "width" : 70, "height": 66},
+	//     { "x": 160, "y": 150, "width" : 45, "height": 146},
+	//     { "x": 205, "y": 150, "width" : 30, "height": 54}]"#,
+
+	// [[0, 150, 50, 100],
+	// [50, 150, 40, 87],
+	// [90, 150, 70, 66],
+	// [160, 150, 45, 146],
+	// [205, 150, 30, 54]].map(e => {
+	//     ctx.rect(...e);
+	//     ctx.stroke();
+	// })
+</script>
