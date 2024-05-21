@@ -7,21 +7,20 @@ use std::io::prelude::Write;
 
 use crate::rectangle::Rectangle;
 
-fn random_vertical_dim() -> (u32, u32) {
+fn random_dim() -> (u32, u32) {
     let w = rand::thread_rng().gen_range(10..20);
-    // ensure vertical in case width equals HIGH
     let h = rand::thread_rng().gen_range(w + 1..50);
 
     (w, h)
 }
 
 pub fn create_base_rectangle() -> Rectangle {
-    let (width, height) = random_vertical_dim();
+    let (width, height) = random_dim();
 
-    Rectangle::new(0, rand::thread_rng().gen_range(10..100), width, height)
+    Rectangle::new(0, rand::thread_rng().gen_range(50..100), width, height)
 }
 pub fn create_ajacent_rectangle(r: &Rectangle) -> Rectangle {
-    let (width, height) = random_vertical_dim();
+    let (width, height) = random_dim();
     Rectangle::new(r.x + r.width, r.y, width, height)
 }
 
@@ -182,7 +181,9 @@ impl fmt::Display for Generator {
 #[cfg(test)]
 mod tests {
     use crate::{
-        generator::{create_ajacent_rectangle, create_base_rectangle, transform_rectangles},
+        generator::{
+            create_ajacent_rectangle, create_base_rectangle, transform_rectangles, Generator,
+        },
         rectangle::Rectangle,
     };
 
@@ -203,6 +204,13 @@ mod tests {
 
         println!("{}", rectangle);
         println!("{}", ajacent);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_random_rectangle_transform() -> Result<(), ()> {
+        let _ = Generator::new(15);
 
         Ok(())
     }
