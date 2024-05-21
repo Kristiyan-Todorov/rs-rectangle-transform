@@ -1,5 +1,9 @@
 use std::io::stdin;
 
+use rectangle::Rectangle;
+
+pub mod rectangle;
+
 fn main() {
     let mut s = String::new();
     let mut number_of_rectangles: usize = 0;
@@ -26,5 +30,15 @@ fn main() {
         println!("Invalid input: {}", s)
     }
 
-    println!("Number of rectangles: {}", number_of_rectangles);
+    let source_rectangles = std::iter::repeat(())
+        .take(number_of_rectangles)
+        .enumerate()
+        .fold(Vec::new(), |mut prev, (idx, _)| {
+            if idx == 0 {
+                prev.push(Rectangle::base_vertical())
+            } else {
+                prev.push(Rectangle::ajacent_vertical(&prev[idx - 1]))
+            }
+            prev
+        });
 }
