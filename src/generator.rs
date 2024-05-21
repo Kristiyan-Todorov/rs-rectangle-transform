@@ -1,9 +1,29 @@
 use core::fmt;
+use rand::Rng;
 use serde_json::json;
+
 use std::fs::File;
 use std::io::prelude::Write;
 
-use crate::rectangle::{create_ajacent_rectangle, create_base_rectangle, Rectangle};
+use crate::rectangle::Rectangle;
+
+fn random_vertical_dim() -> (u32, u32) {
+    let w = rand::thread_rng().gen_range(10..20);
+    // ensure vertical in case width equals HIGH
+    let h = rand::thread_rng().gen_range(w + 1..50);
+
+    (w, h)
+}
+
+pub fn create_base_rectangle() -> Rectangle {
+    let (width, height) = random_vertical_dim();
+
+    Rectangle::new(0, rand::thread_rng().gen_range(10..100), width, height)
+}
+pub fn create_ajacent_rectangle(r: &Rectangle) -> Rectangle {
+    let (width, height) = random_vertical_dim();
+    Rectangle::new(r.x + r.width, r.y, width, height)
+}
 
 fn generate_rectangles(number_of_rectangles: usize) -> Vec<Rectangle> {
     std::iter::repeat(())
@@ -161,9 +181,31 @@ impl fmt::Display for Generator {
 
 #[cfg(test)]
 mod tests {
-    use crate::rectangle::Rectangle;
+    use crate::{
+        generator::{create_ajacent_rectangle, create_base_rectangle, transform_rectangles},
+        rectangle::Rectangle,
+    };
 
-    use super::transform_rectangles;
+    use more_asserts::assert_gt;
+
+    #[test]
+    fn test_rectangle_random_ajacent() -> Result<(), ()> {
+        let rectangle = create_base_rectangle();
+        let ajacent = create_ajacent_rectangle(&rectangle);
+
+        assert_gt!(rectangle.height, rectangle.width);
+        assert_gt!(ajacent.height, ajacent.width);
+        assert_gt!(rectangle.y, rectangle.height);
+
+        assert_eq!(rectangle.x, 0);
+        assert_eq!(ajacent.x, rectangle.x + rectangle.width);
+        assert_eq!(rectangle.y, ajacent.y);
+
+        println!("{}", rectangle);
+        println!("{}", ajacent);
+
+        Ok(())
+    }
 
     #[test]
     fn test_rectangle_transform() -> Result<(), ()> {

@@ -32,8 +32,7 @@ fn main() {
 
     let generator = Generator::new(number_of_rectangles);
 
-    println!("{}", generator);
-
+    // write file
     generator
         .write_file("rectangle_transform.json")
         .expect("Unable to write to file");
