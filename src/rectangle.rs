@@ -1,6 +1,7 @@
 use std::fmt;
 
 use rand::Rng;
+use serde::{Deserialize, Serialize};
 
 static LOW: u32 = 10;
 static HIGH: u32 = 100;
@@ -16,7 +17,7 @@ fn random_vertical_dim() -> (u32, u32) {
 
     (w, h)
 }
-
+#[derive(Clone, Serialize, Deserialize, PartialEq)]
 pub struct Rectangle {
     pub x: u32,
     pub y: u32,
