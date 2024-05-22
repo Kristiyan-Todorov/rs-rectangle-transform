@@ -19,7 +19,7 @@ fn create_base_rectangle() -> Rectangle {
 
     Rectangle::new(0, rand::thread_rng().gen_range(50..100), width, height)
 }
-fn create_ajacent_rectangle(r: &Rectangle) -> Rectangle {
+fn create_adjacent_rectangle(r: &Rectangle) -> Rectangle {
     let (width, height) = random_dim();
     Rectangle::new(r.x + r.width, r.y, width, height)
 }
@@ -32,7 +32,7 @@ fn generate_rectangles(number_of_rectangles: usize) -> Vec<Rectangle> {
             if idx == 0 {
                 prev.push(create_base_rectangle())
             } else {
-                prev.push(create_ajacent_rectangle(&prev[idx - 1]))
+                prev.push(create_adjacent_rectangle(&prev[idx - 1]))
             }
             prev
         })
@@ -57,7 +57,7 @@ fn transform_rectangles(source_rectangles: &Vec<Rectangle>) -> Vec<Rectangle> {
                 ));
             } else {
                 let original_index = source_rectangles.iter().position(|r| r == cur).unwrap();
-                // look left for ajacent rectangles with bigger height
+                // look left for adjacent rectangles with bigger height
                 let mut left: Vec<Rectangle> = Vec::new();
                 for i in (0..original_index).rev() {
                     if source_rectangles[i].height < cur.height {
@@ -69,7 +69,7 @@ fn transform_rectangles(source_rectangles: &Vec<Rectangle>) -> Vec<Rectangle> {
                 // persist original ordering
                 let left: Vec<&Rectangle> = left.iter().rev().collect();
 
-                // look right for ajacent rectangles with bigger height
+                // look right for adjacent rectangles with bigger height
                 let mut right: Vec<&Rectangle> = Vec::new();
                 for i in original_index..source_rectangles.len() {
                     if i == original_index {
@@ -80,12 +80,12 @@ fn transform_rectangles(source_rectangles: &Vec<Rectangle>) -> Vec<Rectangle> {
                     }
                     right.push(&source_rectangles[i])
                 }
-                // merge ajacent rectangles and include current
-                let higher_ajacent = [left, vec![cur], right].concat();
+                // merge adjacent rectangles and include current
+                let higher_adjacent = [left, vec![cur], right].concat();
 
-                if higher_ajacent.len() > 1 {
-                    // left most vertical ajacent to get x coordinates
-                    let left_most = higher_ajacent.first().unwrap();
+                if higher_adjacent.len() > 1 {
+                    // left most vertical adjacent to get x coordinates
+                    let left_most = higher_adjacent.first().unwrap();
 
                     // get all rectangles below current
                     let bottom: Vec<&Rectangle> = prev
@@ -98,7 +98,7 @@ fn transform_rectangles(source_rectangles: &Vec<Rectangle>) -> Vec<Rectangle> {
                     // y coordinates based on bottom rectangle
                     let y: u32 = bottom_rectangle.y - bottom_rectangle.height;
                     let height_to_bottom: u32 = bottom.iter().map(|x| x.height).sum();
-                    let width: u32 = higher_ajacent.iter().map(|x| x.width).sum();
+                    let width: u32 = higher_adjacent.iter().map(|x| x.width).sum();
                     prev.push(Rectangle::new(
                         left_most.x,
                         y,
@@ -106,31 +106,31 @@ fn transform_rectangles(source_rectangles: &Vec<Rectangle>) -> Vec<Rectangle> {
                         cur.height - height_to_bottom,
                     ));
                 } else {
-                    // no higher ajacent elements
+                    // no higher adjacent elements
                     let len = source_rectangles.len();
 
-                    let ajacent = if original_index == 0 {
+                    let adjacent = if original_index == 0 {
                         // original index is 0, pick right rectangle
                         &source_rectangles[1]
                     } else if original_index == len - 1 {
                         // original index is last, pick left rectangle
                         &source_rectangles[len - 2]
                     } else {
-                        // pick higher ajacent rectangle
-                        let mut ajacent = [
+                        // pick higher adjacent rectangle
+                        let mut adjacent = [
                             &source_rectangles[original_index - 1],
                             &source_rectangles[original_index + 1],
                         ];
-                        ajacent.sort_by(|a, b| a.height.cmp(&b.height));
+                        adjacent.sort_by(|a, b| a.height.cmp(&b.height));
 
-                        ajacent[1]
+                        adjacent[1]
                     };
 
                     prev.push(Rectangle::new(
                         cur.x,
-                        ajacent.y - ajacent.height,
+                        adjacent.y - adjacent.height,
                         cur.width,
-                        cur.height - ajacent.height,
+                        cur.height - adjacent.height,
                     ));
                 }
             }
@@ -183,7 +183,7 @@ impl fmt::Display for Generator {
 mod tests {
     use crate::{
         generator::{
-            create_ajacent_rectangle, create_base_rectangle, transform_rectangles, Generator,
+            create_adjacent_rectangle, create_base_rectangle, transform_rectangles, Generator,
         },
         rectangle::Rectangle,
     };
@@ -191,20 +191,20 @@ mod tests {
     use more_asserts::assert_gt;
 
     #[test]
-    fn test_rectangle_random_ajacent() -> Result<(), ()> {
+    fn test_rectangle_random_adjacent() -> Result<(), ()> {
         let rectangle = create_base_rectangle();
-        let ajacent = create_ajacent_rectangle(&rectangle);
+        let adjacent = create_adjacent_rectangle(&rectangle);
 
         assert_gt!(rectangle.height, rectangle.width);
-        assert_gt!(ajacent.height, ajacent.width);
+        assert_gt!(adjacent.height, adjacent.width);
         assert_gt!(rectangle.y, rectangle.height);
 
         assert_eq!(rectangle.x, 0);
-        assert_eq!(ajacent.x, rectangle.x + rectangle.width);
-        assert_eq!(rectangle.y, ajacent.y);
+        assert_eq!(adjacent.x, rectangle.x + rectangle.width);
+        assert_eq!(rectangle.y, adjacent.y);
 
         println!("{}", rectangle);
-        println!("{}", ajacent);
+        println!("{}", adjacent);
 
         Ok(())
     }
