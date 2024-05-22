@@ -1,0 +1,50 @@
+<script>
+	function generate_rectangles() {
+		let canvas = document.querySelector('canvas');
+		let ctx = canvas.getContext('2d');
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+		ctx.beginPath();
+		let number_of_rectangles = document.getElementById(
+			'number_of_rectangles'
+		).value;
+
+		if (number_of_rectangles < 5 || number_of_rectangles > 15) return;
+
+		fetch(`/rectangles/${number_of_rectangles}`)
+			.then((r) => r.json())
+			.then((data) => {
+				data.sourceRectangles.map(({ x, y, width, height }) => {
+					ctx.rect(x + 150, y + 250, width, -height);
+					ctx.stroke();
+				});
+
+				data.targetRectangles.map(({ x, y, width, height }) => {
+					ctx.rect(x + 450, y + 250, width, -height);
+					ctx.stroke();
+				});
+			});
+	}
+</script>
+<body>
+	<div>
+		<div>
+			<span> Number of rectangles: </span>
+			<input
+				id="number_of_rectangles"
+				type="number"
+				min="5"
+				max="15"
+				value="5"
+			/>
+		</div>
+		<button
+			onclick="generate_rectangles()"
+			id="generate_rectangles"
+			type="button"
+		>
+			Generate Rectangles
+		</button>
+	</div>
+	<canvas width="800" height="600" style="background: #f4f4f4"></canvas>
+</body>

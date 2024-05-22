@@ -1,6 +1,6 @@
 use core::fmt;
 use rand::Rng;
-use serde_json::json;
+use serde_json::{json, Value};
 
 use std::fs::File;
 use std::io::prelude::Write;
@@ -159,23 +159,26 @@ impl Generator {
 
     pub fn write_file(&self, path: &str) -> std::io::Result<()> {
         let mut file = File::create(path)?;
-        file.write_all(self.generate_json().as_bytes())?;
+        file.write_all(self.generate_json_string().as_bytes())?;
         Ok(())
     }
 
-    fn generate_json(&self) -> String {
-        serde_json::to_string_pretty(&json!({
+    pub fn generate_json(&self) -> Value {
+        json!({
             "numRects": self.number_of_rectangles,
             "sourceRectangles": self.source_rectangles,
             "targetRectangles": self.target_rectangles
-        }))
-        .unwrap()
+        })
+    }
+
+    pub fn generate_json_string(&self) -> String {
+        serde_json::to_string_pretty(&self.generate_json()).unwrap()
     }
 }
 
 impl fmt::Display for Generator {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.generate_json())
+        write!(f, "{}", self.generate_json_string())
     }
 }
 

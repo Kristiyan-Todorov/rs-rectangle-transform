@@ -14,3 +14,23 @@ and recreates the outline of theoverall shape using the minimum number of horizo
       - width is the sum of all of the adjacent rectangles' widths, including the current one
     - if there are none:
       - get the highest adjacent to calculate y coordinate and height. Width and x coordinate are persisted.
+
+## Usage
+
+### Start application
+
+```sh
+  cargo run --release
+```
+
+![image](assets/console.png)
+
+### Open web page
+
+![image](assets/web_init.png)
+
+### Input number of rectangles and click
+
+#### Note: Graphics are intentionally offset, see generated file for accurate coordinates
+
+![image](assets/web_completed.png)
